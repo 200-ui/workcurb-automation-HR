@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { EmployeeCard } from "@/components/EmployeeCard";
@@ -8,10 +7,12 @@ import { ReportingSection } from "@/components/ReportingSection";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Users, Clock, Calendar, TrendingUp, Bell, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const employees = [
     {
@@ -78,11 +79,7 @@ const Index = () => {
   ];
 
   const handleNotificationClick = () => {
-    toast({
-      title: "Notifications",
-      description: "Opening notification panel...",
-    });
-    console.log("Opening notifications");
+    navigate("/notifications");
   };
 
   const handleSettingsClick = () => {
@@ -94,11 +91,7 @@ const Index = () => {
   };
 
   const handleProfileClick = () => {
-    toast({
-      title: "Profile",
-      description: "Opening user profile...",
-    });
-    console.log("Opening user profile");
+    navigate("/profile");
   };
 
   return (
