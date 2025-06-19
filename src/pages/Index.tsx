@@ -7,9 +7,11 @@ import { StatsCard } from "@/components/StatsCard";
 import { ReportingSection } from "@/components/ReportingSection";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { Users, Clock, Calendar, TrendingUp, Bell, Settings } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const { toast } = useToast();
 
   const employees = [
     {
@@ -75,6 +77,30 @@ const Index = () => {
     }
   ];
 
+  const handleNotificationClick = () => {
+    toast({
+      title: "Notifications",
+      description: "Opening notification panel...",
+    });
+    console.log("Opening notifications");
+  };
+
+  const handleSettingsClick = () => {
+    toast({
+      title: "Settings",
+      description: "Opening user settings...",
+    });
+    console.log("Opening user settings");
+  };
+
+  const handleProfileClick = () => {
+    toast({
+      title: "Profile",
+      description: "Opening user profile...",
+    });
+    console.log("Opening user profile");
+  };
+
   return (
     <SidebarProvider>
       <div className="min-h-screen w-full flex bg-gray-50">
@@ -89,11 +115,24 @@ const Index = () => {
                 <p className="text-gray-600">Welcome back! Here's what's happening today.</p>
               </div>
               <div className="flex items-center gap-4">
-                <Bell className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
-                <Settings className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors" />
-                <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
+                <button 
+                  onClick={handleNotificationClick}
+                  className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+                >
+                  <Bell className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={handleSettingsClick}
+                  className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
+                >
+                  <Settings className="h-6 w-6" />
+                </button>
+                <button
+                  onClick={handleProfileClick}
+                  className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium hover:bg-blue-700 transition-colors"
+                >
                   A
-                </div>
+                </button>
               </div>
             </div>
           </header>

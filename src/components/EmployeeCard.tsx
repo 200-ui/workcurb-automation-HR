@@ -2,6 +2,7 @@
 import { Clock, MapPin, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface Employee {
   id: string;
@@ -19,10 +20,40 @@ interface EmployeeCardProps {
 }
 
 export const EmployeeCard = ({ employee, onSelect }: EmployeeCardProps) => {
+  const { toast } = useToast();
   const isPresent = employee.status === "Present";
 
+  const handleCheckInOut = () => {
+    if (isPresent) {
+      // Handle check-out
+      toast({
+        title: "Check-out Successful",
+        description: `${employee.name} has been checked out.`,
+      });
+    } else {
+      // Handle check-in
+      toast({
+        title: "Check-in Successful", 
+        description: `${employee.name} has been checked in.`,
+      });
+    }
+    console.log(`${isPresent ? 'Check-out' : 'Check-in'} for employee: ${employee.name}`);
+  };
+
+  const handleEmployeeSelect = () => {
+    onSelect(employee);
+    toast({
+      title: "Employee Selected",
+      description: `Viewing details for ${employee.name}`,
+    });
+    console.log('Selected employee:', employee);
+  };
+
   return (
-    <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 hover:border-blue-300">
+    <div 
+      className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all duration-200 hover:border-blue-300 cursor-pointer"
+      onClick={handleEmployeeSelect}
+    >
       <div className="flex items-center gap-4">
         <div className="relative">
           <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
@@ -74,6 +105,10 @@ export const EmployeeCard = ({ employee, onSelect }: EmployeeCardProps) => {
           variant={isPresent ? "destructive" : "default"}
           size="sm"
           className="min-w-[100px]"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleCheckInOut();
+          }}
         >
           {isPresent ? "Check-out" : "Check-in"}
         </Button>
