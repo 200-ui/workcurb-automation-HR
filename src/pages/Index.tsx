@@ -1,11 +1,11 @@
+
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { EmployeeCard } from "@/components/EmployeeCard";
-import { ActivityTimeline } from "@/components/ActivityTimeline";
 import { StatsCard } from "@/components/StatsCard";
 import { ReportingSection } from "@/components/ReportingSection";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Users, Clock, Calendar, TrendingUp, Bell, Settings } from "lucide-react";
+import { Users, Clock, Calendar, TrendingUp, Bell, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -53,28 +53,30 @@ const Index = () => {
     }
   ];
 
-  const activities = [
+  const pendingApprovals = [
     {
-      date: "19 December",
-      type: "location",
-      title: "Location: Dubai",
-      message: "Your Location has been updated",
-      icon: "location"
+      id: 1,
+      type: "Leave Request",
+      employee: "John Smith",
+      details: "Annual Leave - 3 days",
+      date: "Jun 25-27, 2024",
+      priority: "Medium"
     },
     {
-      date: "17 May",
-      type: "designation",
-      title: "Designation: HR Head",
-      message: "Your Designation has been updated",
-      icon: "briefcase"
+      id: 2,
+      type: "Overtime Request",
+      employee: "Sarah Johnson",
+      details: "Weekend work - 8 hours",
+      date: "Jun 22, 2024",
+      priority: "High"
     },
     {
-      date: "05 March",
-      type: "department",
-      title: "Department: Human Resources",
-      subtitle: "Location: California",
-      message: "Your Department, Location have been updated",
-      icon: "building"
+      id: 3,
+      type: "Time Adjustment",
+      employee: "Mike Wilson",
+      details: "Clock-in correction",
+      date: "Jun 19, 2024",
+      priority: "Low"
     }
   ];
 
@@ -82,16 +84,24 @@ const Index = () => {
     navigate("/notifications");
   };
 
-  const handleSettingsClick = () => {
-    toast({
-      title: "Settings",
-      description: "Opening user settings...",
-    });
-    console.log("Opening user settings");
-  };
-
   const handleProfileClick = () => {
     navigate("/profile");
+  };
+
+  const handleApprovalAction = (id: number, action: string) => {
+    toast({
+      title: `Request ${action}`,
+      description: `Approval request has been ${action.toLowerCase()}`,
+    });
+  };
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "High": return "text-red-600 bg-red-50";
+      case "Medium": return "text-yellow-600 bg-yellow-50";
+      case "Low": return "text-green-600 bg-green-50";
+      default: return "text-gray-600 bg-gray-50";
+    }
   };
 
   return (
@@ -104,7 +114,7 @@ const Index = () => {
           <header className="bg-white border-b border-gray-200 px-6 py-4">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
                 <p className="text-gray-600">Welcome back! Here's what's happening today.</p>
               </div>
               <div className="flex items-center gap-4">
@@ -113,12 +123,6 @@ const Index = () => {
                   className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
                 >
                   <Bell className="h-6 w-6" />
-                </button>
-                <button
-                  onClick={handleSettingsClick}
-                  className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
-                >
-                  <Settings className="h-6 w-6" />
                 </button>
                 <button
                   onClick={handleProfileClick}
@@ -182,10 +186,45 @@ const Index = () => {
                 <ReportingSection />
               </div>
 
-              {/* Activity Timeline */}
+              {/* Pending Approvals */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activities</h2>
-                <ActivityTimeline activities={activities} />
+                <div className="flex items-center gap-2 mb-4">
+                  <AlertTriangle className="h-5 w-5 text-orange-500" />
+                  <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+                </div>
+                <div className="space-y-4">
+                  {pendingApprovals.map((approval) => (
+                    <div key={approval.id} className="border border-gray-200 rounded-lg p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div>
+                          <h3 className="font-medium text-gray-900">{approval.type}</h3>
+                          <p className="text-sm text-gray-600">{approval.employee}</p>
+                        </div>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(approval.priority)}`}>
+                          {approval.priority}
+                        </span>
+                      </div>
+                      <p className="text-sm text-gray-700 mb-1">{approval.details}</p>
+                      <p className="text-xs text-gray-500 mb-3">{approval.date}</p>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleApprovalAction(approval.id, "Approved")}
+                          className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200 transition-colors"
+                        >
+                          <CheckCircle className="h-3 w-3" />
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => handleApprovalAction(approval.id, "Rejected")}
+                          className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 transition-colors"
+                        >
+                          <XCircle className="h-3 w-3" />
+                          Reject
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>

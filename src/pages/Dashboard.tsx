@@ -1,31 +1,19 @@
-
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Bell, Settings } from "lucide-react";
+import { Bell } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleNotificationClick = () => {
-    toast({
-      title: "Notifications",
-      description: "Opening notification panel...",
-    });
-  };
-
-  const handleSettingsClick = () => {
-    toast({
-      title: "Settings", 
-      description: "Opening user settings...",
-    });
+    navigate("/notifications");
   };
 
   const handleProfileClick = () => {
-    toast({
-      title: "Profile",
-      description: "Opening user profile...",
-    });
+    navigate("/profile");
   };
 
   return (
@@ -46,12 +34,6 @@ const Dashboard = () => {
                   className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
                 >
                   <Bell className="h-6 w-6" />
-                </button>
-                <button
-                  onClick={handleSettingsClick}
-                  className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
-                >
-                  <Settings className="h-6 w-6" />
                 </button>
                 <button
                   onClick={handleProfileClick}
