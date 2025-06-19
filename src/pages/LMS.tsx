@@ -1,47 +1,56 @@
 
+import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Bell, Settings, BookOpen, Users, Award, Clock } from "lucide-react";
+import { Bell, BookOpen, Users, Award, Clock, Share2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const LMS = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [selectedFaculty, setSelectedFaculty] = useState("all");
+
+  const faculties = [
+    { id: "all", name: "All Faculties", count: 25 },
+    { id: "technical", name: "Technical Skills", count: 8 },
+    { id: "soft-skills", name: "Soft Skills", count: 6 },
+    { id: "compliance", name: "Compliance & Safety", count: 5 },
+    { id: "leadership", name: "Leadership", count: 4 },
+    { id: "finance", name: "Finance & Accounting", count: 2 }
+  ];
+
+  const courses = [
+    { id: 1, title: "Advanced JavaScript", faculty: "technical", description: "Master modern JavaScript concepts and frameworks" },
+    { id: 2, title: "React Development", faculty: "technical", description: "Build modern web applications with React" },
+    { id: 3, title: "Node.js Backend", faculty: "technical", description: "Server-side development with Node.js" },
+    { id: 4, title: "Communication Skills", faculty: "soft-skills", description: "Effective workplace communication techniques" },
+    { id: 5, title: "Time Management", faculty: "soft-skills", description: "Optimize productivity and manage time effectively" },
+    { id: 6, title: "Team Collaboration", faculty: "soft-skills", description: "Work effectively in team environments" },
+    { id: 7, title: "Workplace Safety", faculty: "compliance", description: "Essential safety protocols and procedures" },
+    { id: 8, title: "Data Protection", faculty: "compliance", description: "GDPR compliance and data security" },
+    { id: 9, title: "Leadership Fundamentals", faculty: "leadership", description: "Basic leadership principles and practices" },
+    { id: 10, title: "Strategic Planning", faculty: "leadership", description: "Develop strategic thinking skills" }
+  ];
+
+  const filteredCourses = selectedFaculty === "all" 
+    ? courses 
+    : courses.filter(course => course.faculty === selectedFaculty);
 
   const handleNotificationClick = () => {
-    toast({
-      title: "Notifications",
-      description: "Opening notification panel...",
-    });
-  };
-
-  const handleSettingsClick = () => {
-    toast({
-      title: "Settings",
-      description: "Opening user settings...",
-    });
+    navigate("/notifications");
   };
 
   const handleProfileClick = () => {
-    toast({
-      title: "Profile",
-      description: "Opening user profile...",
-    });
+    navigate("/profile");
   };
 
-  const courses = [
-    { id: 1, title: "Employee Handbook 2024", category: "Onboarding", enrolled: 45, completed: 32, duration: "2 hours" },
-    { id: 2, title: "Workplace Safety Training", category: "Safety", enrolled: 38, completed: 35, duration: "1.5 hours" },
-    { id: 3, title: "Leadership Development", category: "Management", enrolled: 12, completed: 8, duration: "4 hours" },
-    { id: 4, title: "Data Security Awareness", category: "Security", enrolled: 50, completed: 42, duration: "1 hour" },
-    { id: 5, title: "Communication Skills", category: "Soft Skills", enrolled: 28, completed: 20, duration: "3 hours" },
-  ];
-
-  const recentActivity = [
-    { employee: "John Doe", course: "Employee Handbook 2024", action: "Completed", time: "2 hours ago" },
-    { employee: "Sarah Smith", course: "Workplace Safety Training", action: "Started", time: "4 hours ago" },
-    { employee: "Mike Johnson", course: "Data Security Awareness", action: "Completed", time: "6 hours ago" },
-    { employee: "Emily Davis", course: "Leadership Development", action: "In Progress", time: "1 day ago" },
-  ];
+  const handleShareCourse = (courseTitle: string) => {
+    toast({
+      title: "Course Shared",
+      description: `"${courseTitle}" has been shared with employees`,
+    });
+  };
 
   return (
     <SidebarProvider>
@@ -61,12 +70,6 @@ const LMS = () => {
                   className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
                 >
                   <Bell className="h-6 w-6" />
-                </button>
-                <button
-                  onClick={handleSettingsClick}
-                  className="h-6 w-6 text-gray-600 cursor-pointer hover:text-blue-600 transition-colors"
-                >
-                  <Settings className="h-6 w-6" />
                 </button>
                 <button
                   onClick={handleProfileClick}
@@ -126,62 +129,57 @@ const LMS = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <div className="bg-white rounded-lg shadow">
-                <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-900">Course Overview</h2>
-                </div>
-                <div className="p-6">
-                  <div className="space-y-4">
-                    {courses.map((course) => (
-                      <div key={course.id} className="border border-gray-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-semibold text-gray-900">{course.title}</h3>
-                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">
-                            {course.category}
-                          </span>
-                        </div>
-                        <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                          <span>{course.duration}</span>
-                          <span>{course.completed}/{course.enrolled} completed</span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-blue-600 h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${(course.completed / course.enrolled) * 100}%` }}
-                          ></div>
-                        </div>
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              {/* Faculty Sidebar */}
+              <div className="bg-white rounded-lg shadow p-6">
+                <h2 className="text-lg font-semibold text-gray-900 mb-4">Faculties</h2>
+                <div className="space-y-2">
+                  {faculties.map((faculty) => (
+                    <button
+                      key={faculty.id}
+                      onClick={() => setSelectedFaculty(faculty.id)}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                        selectedFaculty === faculty.id
+                          ? "bg-blue-100 text-blue-700 border border-blue-200"
+                          : "hover:bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{faculty.name}</span>
+                        <span className="text-sm text-gray-500">{faculty.count}</span>
                       </div>
-                    ))}
-                  </div>
+                    </button>
+                  ))}
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow">
+              {/* Course Overview */}
+              <div className="lg:col-span-3 bg-white rounded-lg shadow">
                 <div className="p-6 border-b border-gray-200">
-                  <h2 className="text-xl font-semibold text-gray-900">Recent Activity</h2>
+                  <h2 className="text-xl font-semibold text-gray-900">
+                    {selectedFaculty === "all" 
+                      ? "All Courses" 
+                      : faculties.find(f => f.id === selectedFaculty)?.name + " Courses"
+                    }
+                  </h2>
                 </div>
                 <div className="p-6">
-                  <div className="space-y-4">
-                    {recentActivity.map((activity, index) => (
-                      <div key={index} className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50">
-                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-medium text-gray-600">
-                            {activity.employee.charAt(0)}
-                          </span>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    {filteredCourses.map((course) => (
+                      <div key={course.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                        <div className="flex justify-between items-start mb-3">
+                          <h3 className="font-semibold text-gray-900">{course.title}</h3>
+                          <button
+                            onClick={() => handleShareCourse(course.title)}
+                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            title="Share Course"
+                          >
+                            <Share2 className="h-4 w-4" />
+                          </button>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-gray-900">
-                            {activity.employee} {activity.action.toLowerCase()} "{activity.course}"
-                          </p>
-                          <p className="text-xs text-gray-500">{activity.time}</p>
-                        </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          activity.action === 'Completed' ? 'bg-green-100 text-green-800' :
-                          activity.action === 'Started' ? 'bg-blue-100 text-blue-800' :
-                          'bg-yellow-100 text-yellow-800'
-                        }`}>
-                          {activity.action}
+                        <p className="text-gray-600 text-sm mb-3">{course.description}</p>
+                        <span className="inline-block px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          {faculties.find(f => f.id === course.faculty)?.name}
                         </span>
                       </div>
                     ))}

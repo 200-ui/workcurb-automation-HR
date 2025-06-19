@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Bell, Plus, Search, Filter } from "lucide-react";
+import { Bell, Search, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -15,6 +15,7 @@ const KiraTicket = () => {
   const tickets = [
     {
       id: "TICK-001",
+      raiser: "John Smith",
       title: "Unable to clock in",
       description: "The attendance system is not responding when I try to clock in",
       status: "Open",
@@ -25,6 +26,7 @@ const KiraTicket = () => {
     },
     {
       id: "TICK-002", 
+      raiser: "Sarah Johnson",
       title: "Leave request not approved",
       description: "My leave request for next week hasn't been approved yet",
       status: "In Progress",
@@ -35,6 +37,7 @@ const KiraTicket = () => {
     },
     {
       id: "TICK-003",
+      raiser: "Mike Wilson",
       title: "Payroll discrepancy",
       description: "There seems to be an error in my last payslip calculation",
       status: "Resolved",
@@ -44,13 +47,6 @@ const KiraTicket = () => {
       category: "Finance"
     }
   ];
-
-  const handleCreateTicket = () => {
-    toast({
-      title: "Create New Ticket",
-      description: "Opening ticket creation form...",
-    });
-  };
 
   const handleNotificationClick = () => {
     navigate("/notifications");
@@ -132,13 +128,6 @@ const KiraTicket = () => {
                   <option value="Resolved">Resolved</option>
                 </select>
               </div>
-              <button
-                onClick={handleCreateTicket}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="h-4 w-4" />
-                Create Ticket
-              </button>
             </div>
 
             {/* Tickets List */}
@@ -152,6 +141,7 @@ const KiraTicket = () => {
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-2">
                             <span className="font-medium text-gray-900">{ticket.id}</span>
+                            <span className="text-sm text-gray-600">by {ticket.raiser}</span>
                             <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(ticket.status)}`}>
                               {ticket.status}
                             </span>

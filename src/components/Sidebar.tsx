@@ -11,7 +11,8 @@ import {
   Briefcase,
   Ticket,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  MessageCircle
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +20,7 @@ import { NavLink, useLocation } from "react-router-dom";
 
 const menuItems = [
   { icon: Home, label: "Overview", path: "/" },
-  { icon: BarChart3, label: "Dashboard", path: "/dashboard" },
+  { icon: Users, label: "Employee", path: "/employee" },
   { icon: Calendar, label: "Calendar", path: "/calendar" },
   { icon: UserCheck, label: "Attendance", path: "/attendance" },
   { icon: FileText, label: "Leave", path: "/leave" },
@@ -27,6 +28,7 @@ const menuItems = [
   { icon: BarChart3, label: "Performance", path: "/performance" },
   { icon: Briefcase, label: "LMS", path: "/lms" },
   { icon: Ticket, label: "Kira Ticket", path: "/kira-ticket" },
+  { icon: MessageCircle, label: "Chat", path: "/chat" },
 ];
 
 export const Sidebar = () => {

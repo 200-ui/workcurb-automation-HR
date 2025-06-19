@@ -3,14 +3,22 @@ import { useState } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { EmployeeCard } from "@/components/EmployeeCard";
 import { StatsCard } from "@/components/StatsCard";
-import { ReportingSection } from "@/components/ReportingSection";
 import { SidebarProvider } from "@/components/ui/sidebar";
-import { Users, Clock, Calendar, TrendingUp, Bell, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Users, Clock, Calendar, TrendingUp, Bell, Plus, X, Send, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Index = () => {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [todoList, setTodoList] = useState([
+    { id: 1, task: "Review Q2 performance reports", completed: false },
+    { id: 2, task: "Schedule team meeting for project update", completed: true },
+    { id: 3, task: "Approve pending leave requests", completed: false }
+  ]);
+  const [newTodo, setNewTodo] = useState("");
+  const [notice, setNotice] = useState("");
+  const [noticeCategory, setNoticeCategory] = useState("general");
+  const [noticeDepartment, setNoticeDepartment] = useState("all");
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -53,33 +61,6 @@ const Index = () => {
     }
   ];
 
-  const pendingApprovals = [
-    {
-      id: 1,
-      type: "Leave Request",
-      employee: "John Smith",
-      details: "Annual Leave - 3 days",
-      date: "Jun 25-27, 2024",
-      priority: "Medium"
-    },
-    {
-      id: 2,
-      type: "Overtime Request",
-      employee: "Sarah Johnson",
-      details: "Weekend work - 8 hours",
-      date: "Jun 22, 2024",
-      priority: "High"
-    },
-    {
-      id: 3,
-      type: "Time Adjustment",
-      employee: "Mike Wilson",
-      details: "Clock-in correction",
-      date: "Jun 19, 2024",
-      priority: "Low"
-    }
-  ];
-
   const handleNotificationClick = () => {
     navigate("/notifications");
   };
@@ -88,19 +69,45 @@ const Index = () => {
     navigate("/profile");
   };
 
-  const handleApprovalAction = (id: number, action: string) => {
+  const handleAddTodo = () => {
+    if (newTodo.trim()) {
+      const newTask = {
+        id: Date.now(),
+        task: newTodo.trim(),
+        completed: false
+      };
+      setTodoList([...todoList, newTask]);
+      setNewTodo("");
+      toast({
+        title: "Task Added",
+        description: "New task added to your to-do list",
+      });
+    }
+  };
+
+  const handleDeleteTodo = (id: number) => {
+    setTodoList(todoList.filter(todo => todo.id !== id));
     toast({
-      title: `Request ${action}`,
-      description: `Approval request has been ${action.toLowerCase()}`,
+      title: "Task Deleted",
+      description: "Task removed from your to-do list",
     });
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "High": return "text-red-600 bg-red-50";
-      case "Medium": return "text-yellow-600 bg-yellow-50";
-      case "Low": return "text-green-600 bg-green-50";
-      default: return "text-gray-600 bg-gray-50";
+  const handleToggleTodo = (id: number) => {
+    setTodoList(todoList.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    ));
+  };
+
+  const handleSendNotice = () => {
+    if (notice.trim()) {
+      toast({
+        title: "Notice Sent",
+        description: `Notice has been sent to ${noticeDepartment === "all" ? "all employees" : noticeDepartment + " department"}`,
+      });
+      setNotice("");
+      setNoticeCategory("general");
+      setNoticeDepartment("all");
     }
   };
 
@@ -183,47 +190,110 @@ const Index = () => {
                   </div>
                 </div>
 
-                <ReportingSection />
+                {/* To-Do List */}
+                <div className="bg-white rounded-lg border border-gray-200 p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">Today's To-Do List</h2>
+                    <span className="text-sm text-gray-500">{todoList.filter(t => !t.completed).length} remaining</span>
+                  </div>
+                  <div className="space-y-3 mb-4">
+                    {todoList.map((todo) => (
+                      <div key={todo.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
+                        <button
+                          onClick={() => handleToggleTodo(todo.id)}
+                          className={`flex-shrink-0 w-5 h-5 rounded border-2 flex items-center justify-center ${
+                            todo.completed 
+                              ? "bg-green-500 border-green-500 text-white" 
+                              : "border-gray-300 hover:border-green-500"
+                          }`}
+                        >
+                          {todo.completed && <CheckCircle className="h-3 w-3" />}
+                        </button>
+                        <span className={`flex-1 ${todo.completed ? "line-through text-gray-500" : "text-gray-900"}`}>
+                          {todo.task}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteTodo(todo.id)}
+                          className="text-red-500 hover:bg-red-50 p-1 rounded"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newTodo}
+                      onChange={(e) => setNewTodo(e.target.value)}
+                      placeholder="Add a new task..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onKeyPress={(e) => e.key === "Enter" && handleAddTodo()}
+                    />
+                    <button
+                      onClick={handleAddTodo}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              {/* Pending Approvals */}
+              {/* Issue Notice Section */}
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <div className="flex items-center gap-2 mb-4">
-                  <AlertTriangle className="h-5 w-5 text-orange-500" />
-                  <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+                  <Send className="h-5 w-5 text-blue-500" />
+                  <h2 className="text-lg font-semibold text-gray-900">Issue Notice</h2>
                 </div>
                 <div className="space-y-4">
-                  {pendingApprovals.map((approval) => (
-                    <div key={approval.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div>
-                          <h3 className="font-medium text-gray-900">{approval.type}</h3>
-                          <p className="text-sm text-gray-600">{approval.employee}</p>
-                        </div>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getPriorityColor(approval.priority)}`}>
-                          {approval.priority}
-                        </span>
-                      </div>
-                      <p className="text-sm text-gray-700 mb-1">{approval.details}</p>
-                      <p className="text-xs text-gray-500 mb-3">{approval.date}</p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleApprovalAction(approval.id, "Approved")}
-                          className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded text-xs hover:bg-green-200 transition-colors"
-                        >
-                          <CheckCircle className="h-3 w-3" />
-                          Approve
-                        </button>
-                        <button
-                          onClick={() => handleApprovalAction(approval.id, "Rejected")}
-                          className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded text-xs hover:bg-red-200 transition-colors"
-                        >
-                          <XCircle className="h-3 w-3" />
-                          Reject
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    <select
+                      value={noticeCategory}
+                      onChange={(e) => setNoticeCategory(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="general">General</option>
+                      <option value="urgent">Urgent</option>
+                      <option value="policy">Policy Update</option>
+                      <option value="event">Event Announcement</option>
+                      <option value="training">Training</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                    <select
+                      value={noticeDepartment}
+                      onChange={(e) => setNoticeDepartment(e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="all">All Departments</option>
+                      <option value="engineering">Engineering</option>
+                      <option value="marketing">Marketing</option>
+                      <option value="hr">Human Resources</option>
+                      <option value="finance">Finance</option>
+                      <option value="sales">Sales</option>
+                      <option value="design">Design</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Notice Message</label>
+                    <textarea
+                      value={notice}
+                      onChange={(e) => setNotice(e.target.value)}
+                      placeholder="Type your notice here..."
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  </div>
+                  <button
+                    onClick={handleSendNotice}
+                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Send className="h-4 w-4" />
+                    Send Notice
+                  </button>
                 </div>
               </div>
             </div>
